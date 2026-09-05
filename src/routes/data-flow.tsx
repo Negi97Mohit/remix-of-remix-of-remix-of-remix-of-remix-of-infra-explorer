@@ -68,6 +68,58 @@ const STAGES = [
   },
 ];
 
+const SOURCES = [
+  {
+    name: "GOCDB",
+    region: "European grid operations",
+    endpoint: "https://goc.egi.eu/gocdbpi/public/?method=get_site_list",
+    reads: "A list of registered sites with NAME, COUNTRY_CODE, ROC, GIIS_URL and official identifiers.",
+    takes: "Official name, country, country code, operating centre, and the site's GIIS endpoint.",
+  },
+  {
+    name: "BDII / GLUE2",
+    region: "Technical service directory",
+    endpoint: "ldap://sbdii.ui.savba.sk:2170/o=glue",
+    reads: "LDAP records written in the GLUE2 schema: GLUE2Domain, GLUE2Location, GLUE2Service, GLUE2Endpoint and related fields.",
+    takes: "Exact latitude and longitude, the services running at the centre, endpoint URLs, and software implementations. Because raw LDAP cannot be reached from this edge runtime, a real GLUE2 snapshot is used and labelled as such.",
+  },
+  {
+    name: "OSG Topology",
+    region: "United States resource groups",
+    endpoint: "https://topology.opensciencegrid.org/rgsummary/xml",
+    reads: "An XML resource-group summary: each group contains a Facility, Site, SupportCenter and a list of Resources with FQDNs.",
+    takes: "Resource group name, site country, coordinates when published, and resource FQDNs.",
+  },
+];
+
+const RULES = [
+  {
+    signal: "Domain identifier matched",
+    points: 40,
+    body: "After stripping case, spaces, punctuation and normalising separators, the canonical site identifiers are identical. This is the strongest single signal.",
+  },
+  {
+    signal: "Country matched",
+    points: 20,
+    body: "All catalogues in the group publish the same country. A centre cannot be in two places at once, so agreement here carries weight.",
+  },
+  {
+    signal: "Country disagreement",
+    points: -15,
+    body: "Catalogues in the same identifier group disagree about the country. This is a soft penalty that flags the match for review.",
+  },
+  {
+    signal: "Endpoint host matched",
+    points: 25,
+    body: "Two catalogues publish services or contacts on the same machine address, such as the same BDII or FQDN. Shared infrastructure is strong evidence.",
+  },
+  {
+    signal: "Coordinates agree",
+    points: 15,
+    body: "Both catalogues publish latitude and longitude, and the points are within roughly 50 km of each other.",
+  },
+];
+
 function DataFlowPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-10">
@@ -161,7 +213,6 @@ function DataFlowPage() {
       </section>
 
       <div className="grid gap-4 md:grid-cols-2">
-
         <div className="border border-rule bg-paper p-5">
           <h2 className="font-display text-lg font-bold">Provider diversity</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
