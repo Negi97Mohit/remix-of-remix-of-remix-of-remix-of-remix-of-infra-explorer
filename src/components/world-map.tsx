@@ -338,9 +338,10 @@ export function WorldMap({ sites }: WorldMapProps) {
 function HoverCard({
   hovered,
 }: {
-  hovered: { site: Placed; x: number; y: number };
+  hovered: { site: Placed; focus?: ProviderId; x: number; y: number };
 }) {
-  const { site, x, y } = hovered;
+  const { site, x, y, focus } = hovered;
+
   return (
     <div
       className="pointer-events-none fixed z-50 w-[320px] border border-rule bg-paper p-3 shadow-xl"
