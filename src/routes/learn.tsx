@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GraduationCap } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoTip } from "@/components/info-tip";
 
 export const Route = createFileRoute("/learn")({
   head: () => ({
@@ -11,6 +10,14 @@ export const Route = createFileRoute("/learn")({
         content:
           "Background on WLCG grid computing, GOCDB, BDII/GLUE2, OSG Topology, normalization and reconciliation.",
       },
+      { property: "og:title", content: "Learn — WLCG Infrastructure Explorer" },
+      {
+        property: "og:description",
+        content:
+          "Background on WLCG grid computing, GOCDB, BDII/GLUE2, OSG Topology, normalization and reconciliation.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: LearnPage,
@@ -20,14 +27,14 @@ const SECTIONS = [
   {
     title: "WLCG and grid infrastructure metadata",
     body: [
-      "The Worldwide LHC Computing Grid (WLCG) federates computing and storage resources across hundreds of sites on six continents. Coordinating these resources requires authoritative metadata: where a site is, what services it offers, who operates it, and how to contact it.",
-      "No single catalogue is perfect. GOCDB, BDII and OSG Topology each describe overlapping sets of sites, but with different schemas, update cadences, and authority models. This is exactly why reconciliation matters.",
+      "The Worldwide LHC Computing Grid (WLCG) federates computing and storage resources across hundreds of centres on six continents. Coordinating these resources requires authoritative metadata: where a centre is, what services it offers, who operates it, and how to contact it.",
+      "No single catalogue is perfect. GOCDB, BDII and OSG Topology each describe overlapping sets of centres, but with different schemas, update cadences, and authority models. This is exactly why reconciliation matters.",
     ],
   },
   {
-    title: "GOCDB — the EGI site registry",
+    title: "GOCDB — the EGI centre registry",
     body: [
-      "The Grid Operations Centre Database (GOCDB) is the canonical registry for EGI sites and services. It exposes a REST/XML API with endpoints such as get_site_list, returning site records with attributes like NAME, COUNTRY_CODE, ROC and GIIS_URL.",
+      "The Grid Operations Centre Database (GOCDB) is the canonical registry for EGI sites and services. It exposes a REST/XML API with endpoints such as get_site_list, returning records with attributes like NAME, COUNTRY_CODE, ROC and GIIS_URL.",
       "GOCDB records are administratively authoritative, but they usually lack precise geospatial coordinates and describe services indirectly through the site's GIIS URL.",
     ],
   },
@@ -63,23 +70,29 @@ const SECTIONS = [
 
 function LearnPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <div className="flex items-center gap-2">
-        <GraduationCap className="h-6 w-6 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight">Learn</h1>
-      </div>
-      <div className="space-y-4">
+    <div className="mx-auto max-w-3xl space-y-10">
+      <header className="space-y-2 border-b border-rule pb-6">
+        <p className="label-micro">Reference</p>
+        <h1 className="font-display text-4xl font-black">
+          The ideas behind the{" "}
+          <em className="font-normal italic text-accent">explorer</em>
+        </h1>
+        <p className="text-sm text-ink-soft">
+          A short guide to the catalogues, the matching problem, and the terms
+          used in this tool.
+        </p>
+      </header>
+
+      <div className="space-y-6">
         {SECTIONS.map((section, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <CardTitle className="text-base">{section.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
+          <article key={i} className="border border-rule bg-paper p-5">
+            <h2 className="font-display text-xl font-bold">{section.title}</h2>
+            <div className="mt-3 space-y-3 text-sm leading-relaxed text-ink-soft">
               {section.body.map((p, j) => (
                 <p key={j}>{p}</p>
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          </article>
         ))}
       </div>
     </div>
