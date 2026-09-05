@@ -11,7 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as DataFlowRouteImport } from './routes/data-flow'
 import { Route as LearnRouteImport } from './routes/learn'
+import { Route as MapRouteImport } from './routes/map'
+import { Route as ReconciliationRouteImport } from './routes/reconciliation'
 import { Route as SitesRouteImport } from './routes/sites'
 import { Route as SitesIdRouteImport } from './routes/sites.$id'
 
@@ -25,9 +28,24 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DataFlowRoute = DataFlowRouteImport.update({
+  id: '/data-flow',
+  path: '/data-flow',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnRoute = LearnRouteImport.update({
   id: '/learn',
   path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReconciliationRoute = ReconciliationRouteImport.update({
+  id: '/reconciliation',
+  path: '/reconciliation',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitesRoute = SitesRouteImport.update({
@@ -44,14 +62,20 @@ const SitesIdRoute = SitesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
 }
@@ -59,22 +83,53 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/learn' | '/sites' | '/sites/$id'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites'
+    | '/sites/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/learn' | '/sites' | '/sites/$id'
-  id: '__root__' | '/' | '/about' | '/learn' | '/sites' | '/sites/$id'
+  to:
+    | '/'
+    | '/about'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites'
+    | '/sites/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites'
+    | '/sites/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  DataFlowRoute: typeof DataFlowRoute
   LearnRoute: typeof LearnRoute
+  MapRoute: typeof MapRoute
+  ReconciliationRoute: typeof ReconciliationRoute
   SitesRoute: typeof SitesRouteWithChildren
 }
 
@@ -94,11 +149,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/data-flow': {
+      id: '/data-flow'
+      path: '/data-flow'
+      fullPath: '/data-flow'
+      preLoaderRoute: typeof DataFlowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/learn': {
       id: '/learn'
       path: '/learn'
       fullPath: '/learn'
       preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reconciliation': {
+      id: '/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/reconciliation'
+      preLoaderRoute: typeof ReconciliationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sites': {
@@ -131,7 +207,10 @@ const SitesRouteWithChildren = SitesRoute._addFileChildren(SitesRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  DataFlowRoute: DataFlowRoute,
   LearnRoute: LearnRoute,
+  MapRoute: MapRoute,
+  ReconciliationRoute: ReconciliationRoute,
   SitesRoute: SitesRouteWithChildren,
 }
 export const routeTree = rootRouteImport
