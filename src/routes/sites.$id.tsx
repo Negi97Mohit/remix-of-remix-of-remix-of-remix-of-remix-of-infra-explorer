@@ -22,7 +22,7 @@ import type { ProviderId, ProviderRecord } from "@/lib/pipeline/models";
 
 export const Route = createFileRoute("/sites/$id")({
   loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(siteQueryOptions(params.id)),
+    context.queryClient.ensureQueryData(siteQueryOptions(params.id.startsWith("site:") ? params.id : `site:${params.id}`)),
   head: ({ params }) => ({
     meta: [
       { title: `Site ${params.id} — WLCG Infrastructure Explorer` },
