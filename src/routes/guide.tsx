@@ -23,7 +23,81 @@ export const Route = createFileRoute("/guide")({
   component: GuidePage,
 });
 
+const ACRONYMS: [string, string, string][] = [
+  [
+    "WLCG",
+    "Worldwide LHC Computing Grid",
+    "The worldwide network of computing centres that stores and processes data from CERN's particle collider. These are the centres this explorer describes.",
+  ],
+  [
+    "LHC",
+    "Large Hadron Collider",
+    "The particle accelerator at CERN whose experiments produce the data. It is the reason all this computing capacity exists.",
+  ],
+  [
+    "CERN",
+    "European Organization for Nuclear Research",
+    "The laboratory near Geneva that runs the collider and coordinates the computing effort.",
+  ],
+  [
+    "CRIC",
+    "Computing Resource Information Catalogue",
+    "CERN's own system for describing grid resources. This project is inspired by the idea, but is an independent demonstration, not a copy.",
+  ],
+  [
+    "GOCDB",
+    "Grid Operations Centre Database",
+    "The European registry of computing centres. It is the official record for names, countries and who operates a centre — but it rarely publishes exact positions.",
+  ],
+  [
+    "BDII",
+    "Berkeley Database Information Index",
+    "A directory of the technical services running at each centre. The richest source: exact coordinates, server addresses, software versions.",
+  ],
+  [
+    "GLUE2",
+    "Grid Laboratory Uniform Environment, version 2",
+    "The shared vocabulary BDII records are written in — agreed field names like GLUE2LocationLatitude, so different systems can be read the same way.",
+  ],
+  [
+    "OSG",
+    "Open Science Grid",
+    "The United States catalogue of computing resources. It names things its own way, which is exactly why matching is needed.",
+  ],
+  [
+    "LDAP",
+    "Lightweight Directory Access Protocol",
+    "The phone-book style protocol BDII answers on. It is not reachable from this app's hosting, so a stored copy of real records is used and labelled as such.",
+  ],
+  [
+    "XML",
+    "Extensible Markup Language",
+    "A text format that wraps each value in a labelled tag. GOCDB and OSG both publish this way.",
+  ],
+  [
+    "REST",
+    "Representational State Transfer",
+    "Plain web addresses that return data when requested. That is how GOCDB and OSG are read.",
+  ],
+  [
+    "API",
+    "Application Programming Interface",
+    "An address another program can call to get this explorer's unified data as machine-readable text.",
+  ],
+  [
+    "JSON",
+    "JavaScript Object Notation",
+    "The plain-text data format this explorer's own interface returns.",
+  ],
+  [
+    "FQDN",
+    "Fully Qualified Domain Name",
+    "The complete address of a machine, such as ce01.example.ac.uk. A shared machine address is strong evidence two entries are the same centre.",
+  ],
+];
+
 const STEPS = [
+
   {
     n: "01",
     title: "Collect",
