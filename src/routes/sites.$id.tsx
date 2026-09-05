@@ -43,7 +43,8 @@ const PROVIDER_COLORS: Record<ProviderId, string> = {
 
 function SiteDetailPage() {
   const { id } = Route.useParams();
-  const { data: site } = useSuspenseQuery(siteQueryOptions(id));
+  const canonicalId = id.startsWith("site:") ? id : `site:${id}`;
+  const { data: site } = useSuspenseQuery(siteQueryOptions(canonicalId));
 
   if (!site) {
     return (
