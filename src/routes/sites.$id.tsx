@@ -425,7 +425,7 @@ function ComparisonMatrix({
             const present = values.filter((v) => v !== "—");
             const allAgree =
               present.length >= 2 &&
-              present.every((v) => row.compare(v, present[0]));
+              present.every((v) => row.compare(v, present[0]!));
             const anyMissing = values.some((v) => v === "—");
 
             return (
