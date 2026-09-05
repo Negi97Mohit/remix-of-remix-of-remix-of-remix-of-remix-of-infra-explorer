@@ -20,23 +20,34 @@ const CONFIG: Record<ConfidenceBand, { label: string; className: string }> = {
   },
 };
 
+const DEFAULT_CONFIG = CONFIG.SINGLE;
+
 export function ConfidenceBadge({
   band,
+  confidence,
+  score,
   className,
 }: {
-  band: ConfidenceBand;
+  band?: ConfidenceBand | string;
+  confidence?: ConfidenceBand | string;
+  score?: number;
   className?: string;
 }) {
-  const config = CONFIG[band];
+  const rawKey = (band || confidence || "SINGLE").toString().toUpperCase() as ConfidenceBand;
+  const config = CONFIG[rawKey] || DEFAULT_CONFIG;
+
   return (
     <span
       className={cn(
-        "inline-flex items-center border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em]",
+        "inline-flex items-center gap-1 border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] rounded-xs",
         config.className,
         className,
       )}
     >
-      {config.label}
+      <span>{config.label}</span>
+      {score !== undefined && score > 0 && (
+        <span className="font-mono text-[9px] opacity-80">· {score}</span>
+      )}
     </span>
   );
 }

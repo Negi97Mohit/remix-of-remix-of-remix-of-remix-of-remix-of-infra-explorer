@@ -27,15 +27,21 @@ export function ProviderBadge({
   className,
   showShort = false,
 }: {
-  provider: ProviderId;
+  provider: ProviderId | string;
   className?: string;
   showShort?: boolean;
 }) {
-  const config = CONFIG[provider];
+  const key = (provider || "").toLowerCase() as ProviderId;
+  const config = CONFIG[key] || {
+    label: (provider || "UNKNOWN").toUpperCase(),
+    short: (provider || "?")[0]?.toUpperCase(),
+    className: "border-border bg-muted text-muted-foreground",
+  };
+
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.12em]",
+        "inline-flex items-center gap-1 border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.12em] rounded-xs",
         config.className,
         className,
       )}
@@ -49,13 +55,14 @@ export function ProviderBadges({
   providers,
   className,
 }: {
-  providers: ProviderId[];
+  providers: (ProviderId | string)[];
   className?: string;
 }) {
+  if (!providers || providers.length === 0) return null;
   return (
     <div className={cn("flex flex-wrap items-center gap-1", className)}>
-      {providers.map((p) => (
-        <ProviderBadge key={p} provider={p} />
+      {providers.map((p, idx) => (
+        <ProviderBadge key={`${p}-${idx}`} provider={p} />
       ))}
     </div>
   );
