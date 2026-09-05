@@ -17,6 +17,7 @@ import { Route as LearnRouteImport } from './routes/learn'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ReconciliationRouteImport } from './routes/reconciliation'
 import { Route as SitesRouteImport } from './routes/sites'
+import { Route as SitesIndexRouteImport } from './routes/sites.index'
 import { Route as SitesIdRouteImport } from './routes/sites.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const SitesRoute = SitesRouteImport.update({
   path: '/sites',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitesIndexRoute = SitesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SitesRoute,
+} as any)
 const SitesIdRoute = SitesIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
+  '/sites/': typeof SitesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -84,8 +91,8 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
   '/reconciliation': typeof ReconciliationRoute
-  '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
+  '/sites': typeof SitesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +105,7 @@ export interface FileRoutesById {
   '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
+  '/sites/': typeof SitesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +119,7 @@ export interface FileRouteTypes {
     | '/reconciliation'
     | '/sites'
     | '/sites/$id'
+    | '/sites/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -120,8 +129,8 @@ export interface FileRouteTypes {
     | '/learn'
     | '/map'
     | '/reconciliation'
-    | '/sites'
     | '/sites/$id'
+    | '/sites'
   id:
     | '__root__'
     | '/'
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/reconciliation'
     | '/sites'
     | '/sites/$id'
+    | '/sites/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +214,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sites/': {
+      id: '/sites/'
+      path: '/'
+      fullPath: '/sites/'
+      preLoaderRoute: typeof SitesIndexRouteImport
+      parentRoute: typeof SitesRoute
+    }
     '/sites/$id': {
       id: '/sites/$id'
       path: '/$id'
@@ -216,10 +233,12 @@ declare module '@tanstack/react-router' {
 
 interface SitesRouteChildren {
   SitesIdRoute: typeof SitesIdRoute
+  SitesIndexRoute: typeof SitesIndexRoute
 }
 
 const SitesRouteChildren: SitesRouteChildren = {
   SitesIdRoute: SitesIdRoute,
+  SitesIndexRoute: SitesIndexRoute,
 }
 
 const SitesRouteWithChildren = SitesRoute._addFileChildren(SitesRouteChildren)
