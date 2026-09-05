@@ -25,8 +25,8 @@ const TRANSPORT: Record<ProviderId, string> = {
 interface ProviderResult {
   records: ProviderRecord[];
   latency_ms: number;
-  mode?: "live" | "snapshot";
-  error?: string;
+  mode?: "live" | "snapshot" | undefined;
+  error?: string | undefined;
 }
 
 async function safeFetch(

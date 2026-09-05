@@ -10,7 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ApiRouteImport } from './routes/api'
+import { Route as DataFlowRouteImport } from './routes/data-flow'
+import { Route as LearnRouteImport } from './routes/learn'
+import { Route as MapRouteImport } from './routes/map'
+import { Route as ReconciliationRouteImport } from './routes/reconciliation'
 import { Route as SitesRouteImport } from './routes/sites'
+import { Route as SitesIndexRouteImport } from './routes/sites.index'
 import { Route as SitesIdRouteImport } from './routes/sites.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,10 +25,45 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRoute = ApiRouteImport.update({
+  id: '/api',
+  path: '/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataFlowRoute = DataFlowRouteImport.update({
+  id: '/data-flow',
+  path: '/data-flow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReconciliationRoute = ReconciliationRouteImport.update({
+  id: '/reconciliation',
+  path: '/reconciliation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitesRoute = SitesRouteImport.update({
   id: '/sites',
   path: '/sites',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SitesIndexRoute = SitesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SitesRoute,
 } as any)
 const SitesIdRoute = SitesIdRouteImport.update({
   id: '/$id',
@@ -31,30 +73,86 @@ const SitesIdRoute = SitesIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
+  '/data-flow': typeof DataFlowRoute
+  '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
+  '/sites/': typeof SitesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/sites': typeof SitesRouteWithChildren
+  '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
+  '/data-flow': typeof DataFlowRoute
+  '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites/$id': typeof SitesIdRoute
+  '/sites': typeof SitesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
+  '/data-flow': typeof DataFlowRoute
+  '/learn': typeof LearnRoute
+  '/map': typeof MapRoute
+  '/reconciliation': typeof ReconciliationRoute
   '/sites': typeof SitesRouteWithChildren
   '/sites/$id': typeof SitesIdRoute
+  '/sites/': typeof SitesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sites' | '/sites/$id'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/api'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites'
+    | '/sites/$id'
+    | '/sites/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sites' | '/sites/$id'
-  id: '__root__' | '/' | '/sites' | '/sites/$id'
+  to:
+    | '/'
+    | '/about'
+    | '/api'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites/$id'
+    | '/sites'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/api'
+    | '/data-flow'
+    | '/learn'
+    | '/map'
+    | '/reconciliation'
+    | '/sites'
+    | '/sites/$id'
+    | '/sites/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ApiRoute: typeof ApiRoute
+  DataFlowRoute: typeof DataFlowRoute
+  LearnRoute: typeof LearnRoute
+  MapRoute: typeof MapRoute
+  ReconciliationRoute: typeof ReconciliationRoute
   SitesRoute: typeof SitesRouteWithChildren
 }
 
@@ -67,12 +165,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api': {
+      id: '/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof ApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-flow': {
+      id: '/data-flow'
+      path: '/data-flow'
+      fullPath: '/data-flow'
+      preLoaderRoute: typeof DataFlowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reconciliation': {
+      id: '/reconciliation'
+      path: '/reconciliation'
+      fullPath: '/reconciliation'
+      preLoaderRoute: typeof ReconciliationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sites': {
       id: '/sites'
       path: '/sites'
       fullPath: '/sites'
       preLoaderRoute: typeof SitesRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/sites/': {
+      id: '/sites/'
+      path: '/'
+      fullPath: '/sites/'
+      preLoaderRoute: typeof SitesIndexRouteImport
+      parentRoute: typeof SitesRoute
     }
     '/sites/$id': {
       id: '/sites/$id'
@@ -86,16 +233,24 @@ declare module '@tanstack/react-router' {
 
 interface SitesRouteChildren {
   SitesIdRoute: typeof SitesIdRoute
+  SitesIndexRoute: typeof SitesIndexRoute
 }
 
 const SitesRouteChildren: SitesRouteChildren = {
   SitesIdRoute: SitesIdRoute,
+  SitesIndexRoute: SitesIndexRoute,
 }
 
 const SitesRouteWithChildren = SitesRoute._addFileChildren(SitesRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ApiRoute: ApiRoute,
+  DataFlowRoute: DataFlowRoute,
+  LearnRoute: LearnRoute,
+  MapRoute: MapRoute,
+  ReconciliationRoute: ReconciliationRoute,
   SitesRoute: SitesRouteWithChildren,
 }
 export const routeTree = rootRouteImport

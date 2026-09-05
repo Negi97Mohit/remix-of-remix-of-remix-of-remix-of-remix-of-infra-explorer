@@ -19,10 +19,10 @@ export interface QualityFinding {
 
 export interface NormalizedService {
   name: string;
-  type?: string;
-  endpoint?: string;
-  implementation?: string;
-  version?: string;
+  type?: string | undefined;
+  endpoint?: string | undefined;
+  implementation?: string | undefined;
+  version?: string | undefined;
 }
 
 /** One provider's description of one site, after normalization. */
@@ -33,11 +33,11 @@ export interface ProviderRecord {
   /** Native identifier inside the provider system. */
   native_id: string;
   name: string;
-  description?: string;
-  country?: string;
-  country_code?: string;
-  latitude?: number;
-  longitude?: number;
+  description?: string | undefined;
+  country?: string | undefined;
+  country_code?: string | undefined;
+  latitude?: number | undefined;
+  longitude?: number | undefined;
   /** Where the coordinates came from: provider-supplied or country centroid. */
   coordinate_precision: "exact" | "country" | "none";
   endpoints: string[];
@@ -77,16 +77,16 @@ export interface FieldConflict {
   field: string;
   values: { provider: ProviderId; source_id: string; value: string }[];
   status: "unresolved" | "resolved-by-precedence";
-  resolution?: string;
+  resolution?: string | undefined;
 }
 
 export interface ReconciledSite {
   canonical_id: string;
   name: string;
-  country?: string;
-  country_code?: string;
-  latitude?: number;
-  longitude?: number;
+  country?: string | undefined;
+  country_code?: string | undefined;
+  latitude?: number | undefined;
+  longitude?: number | undefined;
   coordinate_precision: "exact" | "country" | "none";
   providers: ProviderId[];
   source_ids: string[];
@@ -112,8 +112,8 @@ export interface ProviderHealth {
   record_count: number;
   latency_ms: number | null;
   last_retrieved: string | null;
-  note?: string;
-  error?: string;
+  note?: string | undefined;
+  error?: string | undefined;
 }
 
 export interface Snapshot {
