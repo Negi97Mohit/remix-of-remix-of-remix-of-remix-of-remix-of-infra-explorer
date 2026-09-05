@@ -5,6 +5,7 @@
 [build.environment]
   NITRO_PRESET = "netlify"
   NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 # Optional headers for security and caching
 [[headers]]
