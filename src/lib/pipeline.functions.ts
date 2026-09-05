@@ -52,3 +52,62 @@ export type GetSiteResult = ReturnType<typeof getSite> extends Promise<infer T>
   ? T
   : never;
 export type SiteRecord = ProviderRecord;
+
+/**
+ * Server-side validation of the finished snapshot. The browser only renders
+ * the verdicts — every integrity test runs here.
+ */
+export const getValidation = createServerFn({ method: "GET" }).handler(async () => {
+  const snapshot = await getOrBuild();
+  const { validateSnapshot } = await import("@/lib/pipeline/validation");
+  return validateSnapshot(snapshot);
+});
+
+/**
+ * Searchable window over the raw ingested records. Filtering happens on the
+ * server so the browser never has to download every catalogue payload.
+ */
+export const getRecords = createServerFn({ method: "GET" })
+  .validator(
+    (data: {
+      query?: string;
+      provider?: ProviderRecord["provider"] | "all";
+      limit?: number;
+      offset?: number;
+    }) => data,
+  )
+  .handler(async ({ data }) => {
+    const snapshot = await getOrBuild();
+    const siteOf = new Map<string, string>();
+    for (const s of snapshot.sites) {
+      for (const r of s.records) siteOf.set(r.source_id, s.canonical_id);
+    }
+
+    const q = (data.query ?? "").trim().toLowerCase();
+    const provider = data.provider ?? "all";
+    const filtered = snapshot.records.filter((r) => {
+      if (provider !== "all" && r.provider !== provider) return false;
+      if (!q) return true;
+      return (
+        r.name.toLowerCase().includes(q) ||
+        r.source_id.toLowerCase().includes(q) ||
+        (r.country ?? "").toLowerCase().includes(q) ||
+        r.endpoints.some((e) => e.toLowerCase().includes(q)) ||
+        Object.values(r.raw).some((v) => String(v).toLowerCase().includes(q))
+      );
+    });
+
+    const offset = data.offset ?? 0;
+    const limit = Math.min(data.limit ?? 40, 100);
+    return {
+      total: filtered.length,
+      grand_total: snapshot.records.length,
+      offset,
+      limit,
+      built_at: snapshot.built_at,
+      rows: filtered.slice(offset, offset + limit).map((r) => ({
+        record: r,
+        canonical_id: siteOf.get(r.source_id) ?? null,
+      })),
+    };
+  });

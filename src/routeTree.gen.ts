@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApiRouteImport } from './routes/api'
+import { Route as DataRouteImport } from './routes/data'
 import { Route as DataFlowRouteImport } from './routes/data-flow'
 import { Route as GuideRouteImport } from './routes/guide'
 import { Route as LearnRouteImport } from './routes/learn'
@@ -34,6 +35,11 @@ const AboutRoute = AboutRouteImport.update({
 const ApiRoute = ApiRouteImport.update({
   id: '/api',
   path: '/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataRoute = DataRouteImport.update({
+  id: '/data',
+  path: '/data',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataFlowRoute = DataFlowRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
+  '/data': typeof DataRoute
   '/data-flow': typeof DataFlowRoute
   '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
+  '/data': typeof DataRoute
   '/data-flow': typeof DataFlowRoute
   '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
+  '/data': typeof DataRoute
   '/data-flow': typeof DataFlowRoute
   '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api'
+    | '/data'
     | '/data-flow'
     | '/guide'
     | '/learn'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api'
+    | '/data'
     | '/data-flow'
     | '/guide'
     | '/learn'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/api'
+    | '/data'
     | '/data-flow'
     | '/guide'
     | '/learn'
@@ -161,6 +173,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ApiRoute: typeof ApiRoute
+  DataRoute: typeof DataRoute
   DataFlowRoute: typeof DataFlowRoute
   GuideRoute: typeof GuideRoute
   LearnRoute: typeof LearnRoute
@@ -190,6 +203,13 @@ declare module '@tanstack/react-router' {
       path: '/api'
       fullPath: '/api'
       preLoaderRoute: typeof ApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data': {
+      id: '/data'
+      path: '/data'
+      fullPath: '/data'
+      preLoaderRoute: typeof DataRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data-flow': {
@@ -267,6 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ApiRoute: ApiRoute,
+  DataRoute: DataRoute,
   DataFlowRoute: DataFlowRoute,
   GuideRoute: GuideRoute,
   LearnRoute: LearnRoute,
