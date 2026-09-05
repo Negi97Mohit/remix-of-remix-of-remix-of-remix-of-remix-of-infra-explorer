@@ -63,7 +63,7 @@ export function WorldMap({ sites }: WorldMapProps) {
           className="w-full rounded-md border border-border/60 bg-background px-3 py-2 text-sm outline-none ring-primary focus-visible:ring-1"
         />
       </div>
-      <div className="relative overflow-hidden rounded-xl border border-border/60 bg-slate-950/40">
+      <div className="relative h-[560px] overflow-hidden rounded-xl border border-border/60 bg-slate-950/40">
         <div className="absolute left-3 top-3 z-10 flex gap-2 rounded-md border border-border/60 bg-background/90 p-1.5 text-[10px] font-medium backdrop-blur">
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-emerald-400" /> High</span>
           <span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-amber-400" /> Medium</span>
@@ -73,8 +73,7 @@ export function WorldMap({ sites }: WorldMapProps) {
         <ComposableMap
           projection="geoMercator"
           projectionConfig={{ scale: 140 }}
-          className="h-[560px] w-full"
-          style={{ background: "transparent" }}
+          style={{ width: "100%", height: "100%", background: "transparent" }}
         >
           <ZoomableGroup
             zoom={position.zoom}
