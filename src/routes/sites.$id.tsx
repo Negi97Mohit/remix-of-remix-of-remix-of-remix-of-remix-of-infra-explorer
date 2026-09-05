@@ -17,6 +17,7 @@ import { ConfidenceBadge } from "@/components/confidence-badge";
 import { ProviderBadge, ProviderBadges } from "@/components/provider-badge";
 import { QualityList } from "@/components/quality-list";
 import { InfoTip } from "@/components/info-tip";
+import { ScoringGuide } from "@/components/scoring-guide";
 import { cn } from "@/lib/utils";
 import type { ProviderId, ProviderRecord } from "@/lib/pipeline/models";
 
@@ -272,9 +273,29 @@ function SiteDetailPage() {
       ) : null}
 
       <section className="space-y-3">
+        <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+          <GitMerge className="h-5 w-5" /> Field-by-field comparison{" "}
+          <InfoTip term="provider" />
+        </h2>
+        <p className="max-w-2xl text-sm text-ink-soft">
+          Each row is one field. Each column is one catalogue. Values that agree
+          across catalogues are highlighted; differences are shown so they can be
+          judged.
+        </p>
+        <ComparisonMatrix records={site.records} providers={site.providers} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+          How the score was reached <InfoTip term="confidence" />
+        </h2>
+        <ScoringGuide compact />
+      </section>
+
+      <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
-            <GitMerge className="h-5 w-5" /> Side-by-side catalogue records{" "}
+            <GitMerge className="h-5 w-5" /> Raw catalogue records{" "}
             <InfoTip term="provider" />
           </h2>
           <div className="flex flex-wrap items-center gap-1">
