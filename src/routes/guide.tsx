@@ -105,6 +105,32 @@ function GuidePage() {
       </header>
 
       <section className="space-y-6">
+        <h2 className="font-display text-2xl font-bold">
+          Every acronym on this site, in plain words
+        </h2>
+        <p className="max-w-2xl text-sm leading-relaxed text-ink-soft">
+          This field uses a lot of short names. Here is what each one stands for
+          and why it appears here.
+        </p>
+        <dl className="divide-y divide-border border-y border-border">
+          {ACRONYMS.map(([short, long, why]) => (
+            <div key={short} className="grid gap-1 py-4 sm:grid-cols-[220px_1fr]">
+              <dt className="space-y-0.5">
+                <span className="block font-mono text-sm font-semibold text-accent">
+                  {short}
+                </span>
+                <span className="block text-[11px] text-muted-foreground">
+                  {long}
+                </span>
+              </dt>
+              <dd className="text-sm leading-relaxed text-ink-soft">{why}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+
+      <section className="space-y-6">
         <h2 className="font-display text-2xl font-bold">How it works</h2>
         <ol className="divide-y divide-border border-y border-border">
           {STEPS.map((s) => (
