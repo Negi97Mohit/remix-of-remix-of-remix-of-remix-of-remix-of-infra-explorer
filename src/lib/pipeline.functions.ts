@@ -36,7 +36,7 @@ export const getProviders = createServerFn({ method: "GET" }).handler(async () =
 
 /** A single reconciled site plus its source records, for the detail page. */
 export const getSite = createServerFn({ method: "GET" })
-  .inputValidator((data: { canonical_id: string }) => data)
+  .validator((data: { canonical_id: string }) => data)
   .handler(async ({ data }) => {
     const snapshot = await getOrBuild();
     const site = snapshot.sites.find(
