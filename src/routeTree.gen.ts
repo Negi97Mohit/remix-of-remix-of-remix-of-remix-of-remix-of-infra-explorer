@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ApiRouteImport } from './routes/api'
 import { Route as DataFlowRouteImport } from './routes/data-flow'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as MapRouteImport } from './routes/map'
@@ -26,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRoute = ApiRouteImport.update({
+  id: '/api',
+  path: '/api',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataFlowRoute = DataFlowRouteImport.update({
@@ -62,6 +68,7 @@ const SitesIdRoute = SitesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/api'
     | '/data-flow'
     | '/learn'
     | '/map'
@@ -105,6 +115,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/api'
     | '/data-flow'
     | '/learn'
     | '/map'
@@ -115,6 +126,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/api'
     | '/data-flow'
     | '/learn'
     | '/map'
@@ -126,6 +138,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ApiRoute: typeof ApiRoute
   DataFlowRoute: typeof DataFlowRoute
   LearnRoute: typeof LearnRoute
   MapRoute: typeof MapRoute
@@ -147,6 +160,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api': {
+      id: '/api'
+      path: '/api'
+      fullPath: '/api'
+      preLoaderRoute: typeof ApiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data-flow': {
@@ -207,6 +227,7 @@ const SitesRouteWithChildren = SitesRoute._addFileChildren(SitesRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ApiRoute: ApiRoute,
   DataFlowRoute: DataFlowRoute,
   LearnRoute: LearnRoute,
   MapRoute: MapRoute,
