@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { to: "/", label: "Dashboard", icon: Activity },
   { to: "/map", label: "World Map", icon: Globe },
-  { to: "/sites/", label: "Sites", icon: Database },
+  { to: "/sites", label: "Sites", icon: Database },
   { to: "/reconciliation", label: "Reconciliation", icon: GitMerge },
   { to: "/data-flow", label: "Data Flow", icon: Workflow },
   { to: "/learn", label: "Learn", icon: GraduationCap },
