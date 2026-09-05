@@ -364,22 +364,44 @@ function HoverCard({
       <p className="mt-3 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-accent">
         {site.records.length === 1
           ? "Described by 1 catalogue"
-          : `The same centre in ${site.records.length} catalogues`}
+          : `${site.records.length} catalogue entries unified into this one centre`}
       </p>
       <div className="mt-1.5 divide-y divide-border border-y border-border">
-        {site.records.map((r) => (
-          <div key={r.source_id} className="flex gap-2 py-1.5">
-            <ProviderBadge provider={r.provider} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[11.5px] font-medium">{r.name}</p>
-              <p className="truncate text-[10px] text-muted-foreground">
-                {r.country ?? "—"} · {r.services.length} services ·{" "}
-                {r.endpoints.length} endpoints
-              </p>
+        {site.records.map((r) => {
+          const hasOwn =
+            r.coordinate_precision === "exact" &&
+            typeof r.latitude === "number" &&
+            typeof r.longitude === "number";
+          return (
+            <div
+              key={r.source_id}
+              className={cn(
+                "flex gap-2 py-1.5",
+                focus === r.provider && "bg-accent/8",
+              )}
+            >
+              <span
+                className="mt-1 h-2 w-2 shrink-0"
+                style={{ background: PROVIDER_COLOR[r.provider] }}
+              />
+              <ProviderBadge provider={r.provider} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[11.5px] font-medium">{r.name}</p>
+                <p className="truncate text-[10px] text-muted-foreground">
+                  {r.country ?? "—"} · {r.services.length} services ·{" "}
+                  {r.endpoints.length} endpoints
+                </p>
+                <p className="truncate font-mono text-[9.5px] text-muted-foreground">
+                  {hasOwn
+                    ? `${r.latitude!.toFixed(2)}, ${r.longitude!.toFixed(2)} (own position)`
+                    : "no position published — placed beside the centre"}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
 
       {site.evidence.length > 0 ? (
         <p className="mt-2 text-[10.5px] leading-relaxed text-ink-soft">
