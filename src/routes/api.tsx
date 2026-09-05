@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Code2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoTip } from "@/components/info-tip";
 
 export const Route = createFileRoute("/api")({
   head: () => ({
@@ -11,6 +11,14 @@ export const Route = createFileRoute("/api")({
         content:
           "API documentation for the WLCG Infrastructure Explorer: endpoints, example requests and example responses.",
       },
+      { property: "og:title", content: "API — WLCG Infrastructure Explorer" },
+      {
+        property: "og:description",
+        content:
+          "API documentation for the WLCG Infrastructure Explorer: endpoints, example requests and example responses.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ApiPage,
@@ -127,47 +135,45 @@ const ENDPOINTS = [
 
 function ApiPage() {
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div className="space-y-1">
-        <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-          <Code2 className="h-6 w-6" /> API Reference
+    <div className="mx-auto max-w-4xl space-y-10">
+      <header className="space-y-2 border-b border-rule pb-6">
+        <p className="label-micro">API</p>
+        <h1 className="flex items-center gap-3 font-display text-4xl font-black">
+          <Code2 className="h-8 w-8" /> Reference
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Backend base URL: <span className="font-mono text-foreground">http://localhost:8000</span>
+        <p className="text-sm text-ink-soft">
+          Backend base URL: <span className="font-mono">http://localhost:8000</span>
+          <InfoTip term="api" className="ml-1" />
         </p>
-      </div>
+      </header>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {ENDPOINTS.map((ep) => (
-          <Card key={ep.path}>
-            <CardHeader className="pb-2">
+          <div key={ep.path} className="border border-rule bg-paper">
+            <div className="border-b border-rule p-4">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary">
+                <span className="border border-accent/40 bg-accent/10 px-1.5 py-0.5 text-[10px] font-bold text-accent">
                   {ep.method}
                 </span>
-                <CardTitle className="text-base font-mono">{ep.path}</CardTitle>
+                <h2 className="font-mono text-base font-semibold">{ep.path}</h2>
               </div>
-              <p className="text-sm text-muted-foreground">{ep.summary}</p>
-            </CardHeader>
-            <CardContent className="space-y-3">
+              <p className="mt-1 text-sm text-ink-soft">{ep.summary}</p>
+            </div>
+            <div className="grid gap-4 p-4 md:grid-cols-2">
               <div>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Example request
-                </div>
-                <pre className="overflow-x-auto rounded bg-secondary/50 p-2 text-xs font-mono">
+                <div className="mb-1 label-micro">Example request</div>
+                <pre className="overflow-x-auto border border-rule bg-secondary/30 p-3 text-[10.5px] font-mono">
                   {ep.example}
                 </pre>
               </div>
               <div>
-                <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Example response
-                </div>
-                <pre className="overflow-x-auto rounded bg-secondary/50 p-2 text-xs font-mono">
+                <div className="mb-1 label-micro">Example response</div>
+                <pre className="overflow-x-auto border border-rule bg-secondary/30 p-3 text-[10.5px] font-mono">
                   {ep.response}
                 </pre>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
     </div>

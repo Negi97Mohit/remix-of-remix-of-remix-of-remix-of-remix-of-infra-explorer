@@ -8,17 +8,17 @@ const CONFIG: Record<
   gocdb: {
     label: "GOCDB",
     short: "G",
-    className: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    className: "border-foreground/10 bg-secondary text-foreground",
   },
   bdii: {
     label: "BDII",
     short: "B",
-    className: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    className: "border-accent/40 bg-accent/10 text-accent",
   },
   osg: {
     label: "OSG",
     short: "O",
-    className: "border-orange-500/30 bg-orange-500/10 text-orange-300",
+    className: "border-foreground/10 bg-foreground text-background",
   },
 };
 
@@ -35,7 +35,7 @@ export function ProviderBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11px] font-semibold",
+        "inline-flex items-center gap-1 border px-1.5 py-0.5 text-[9.5px] font-semibold uppercase tracking-[0.12em]",
         config.className,
         className,
       )}

@@ -9,9 +9,9 @@ const ICON = {
 } as const;
 
 const CLASS = {
-  info: "text-sky-400",
-  warning: "text-amber-400",
-  error: "text-rose-400",
+  info: "text-accent",
+  warning: "text-amber-600",
+  error: "text-destructive",
 } as const;
 
 export function QualityList({
