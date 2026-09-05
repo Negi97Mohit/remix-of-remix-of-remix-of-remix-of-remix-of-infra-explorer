@@ -61,6 +61,12 @@ function DashboardPage() {
       term: "canonical",
     },
     {
+      label: "Source records",
+      value: snapshot.records.length,
+      note: "across catalogues",
+      term: "provider",
+    },
+    {
       label: "Unified",
       value: matched.length,
       note: "in 2+ catalogues",
