@@ -89,7 +89,79 @@ function DataFlowPage() {
         ))}
       </div>
 
+      <section className="space-y-4">
+        <h2 className="font-display text-2xl font-bold">
+          Where the data actually comes from
+        </h2>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          Nothing here is invented. Each row below is a real public catalogue,
+          read when the page is built, in the format that catalogue publishes.
+        </p>
+        <div className="divide-y divide-border border-y border-border">
+          {SOURCES.map((s) => (
+            <div key={s.name} className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-accent">
+                  {s.name}
+                </p>
+                <p className="text-[10.5px] text-muted-foreground">{s.region}</p>
+              </div>
+              <div className="space-y-1.5">
+                <p className="break-all font-mono text-[10.5px] text-muted-foreground">
+                  {s.endpoint}
+                </p>
+                <p className="text-sm leading-relaxed text-ink-soft">{s.reads}</p>
+                <p className="text-[11px] text-muted-foreground">
+                  <span className="font-semibold">We take:</span> {s.takes}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="font-display text-2xl font-bold">
+          How we decide two entries are the same centre
+        </h2>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          Entries are never merged because a person said so. Each catalogue
+          entry's name is first stripped down to a comparable form — lowercase,
+          spaces and underscores turned into hyphens, punctuation removed — and
+          entries that reduce to the same form are put in one group. The group is
+          then tested against the checks below, and the points add up to the
+          score you see on every match.
+        </p>
+        <div className="divide-y divide-border border-y border-border">
+          {RULES.map((r) => (
+            <div key={r.signal} className="grid gap-2 py-4 sm:grid-cols-[80px_1fr]">
+              <span
+                className={
+                  r.points > 0
+                    ? "font-mono text-sm font-semibold text-accent"
+                    : "font-mono text-sm font-semibold text-destructive"
+                }
+              >
+                {r.points > 0 ? `+${r.points}` : r.points}
+              </span>
+              <div>
+                <p className="text-sm font-semibold">{r.signal}</p>
+                <p className="text-sm leading-relaxed text-ink-soft">{r.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          70 points or more is a high-confidence match, 45 or more is medium,
+          anything lower is flagged for a human to decide, and an entry no other
+          catalogue knows about is marked as single-source. When two catalogues
+          state different values for the same field, the disagreement is shown
+          rather than resolved away.
+        </p>
+      </section>
+
       <div className="grid gap-4 md:grid-cols-2">
+
         <div className="border border-rule bg-paper p-5">
           <h2 className="font-display text-lg font-bold">Provider diversity</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-soft">
