@@ -12,14 +12,28 @@ import { cn } from "@/lib/utils";
  * Keyed by short term so any page can reference the same wording.
  */
 export const GLOSSARY: Record<string, string> = {
+  wlcg: "WLCG stands for Worldwide LHC Computing Grid — the network of computing centres that stores and processes the data produced by CERN's Large Hadron Collider.",
+  lhc: "LHC stands for Large Hadron Collider, the particle accelerator at CERN whose experiments produce the data these computing centres handle.",
+  cern: "CERN is the European Organization for Nuclear Research, near Geneva, which runs the Large Hadron Collider.",
+  cric: "CRIC stands for Computing Resource Information Catalogue — CERN's own system for describing grid resources. This explorer is inspired by it, not a copy of it.",
+  grid: "A grid is a set of computing centres in different countries that work together as if they were one machine.",
   site: "A physical computing centre that contributes storage or processing power to the grid. One site can be described by several catalogues at once.",
   provider:
     "A catalogue that publishes infrastructure metadata. This app reads three of them: GOCDB (Europe), BDII/GLUE2 (technical service directory) and OSG Topology (United States).",
   gocdb:
-    "GOCDB — the European operations registry. Administratively authoritative: official names, countries and operating centres, but rarely exact coordinates.",
+    "GOCDB stands for Grid Operations Centre Database — the European operations registry. Administratively authoritative: official names, countries and operating centres, but rarely exact coordinates.",
   bdii:
-    "BDII publishes GLUE2 records over LDAP. The richest technical source: exact latitude/longitude, service endpoints, software implementations and versions.",
-  osg: "OSG Topology — the United States resource catalogue, published as XML. Uses its own naming conventions, so names must be normalized before comparing.",
+    "BDII stands for Berkeley Database Information Index. It publishes GLUE2 records over LDAP and is the richest technical source: exact latitude/longitude, service endpoints, software implementations and versions.",
+  glue2:
+    "GLUE2 is the agreed vocabulary grid services use to describe themselves — a standard set of field names such as GLUE2LocationLatitude, so different systems can be read the same way.",
+  osg: "OSG stands for Open Science Grid. Its Topology catalogue is the United States resource list, published as XML. It uses its own naming conventions, so names must be normalized before comparing.",
+  ldap: "LDAP is a directory protocol — a way of asking a server for structured records over the network, like a phone book query. BDII publishes through it.",
+  xml: "XML is a text format that wraps each value in a labelled tag. GOCDB and OSG publish their catalogues this way.",
+  rest: "REST just means the catalogue answers ordinary web addresses: you request a URL and it returns data.",
+  json: "JSON is the plain-text data format this app's own interface returns.",
+  api: "API stands for Application Programming Interface — an address another program can call to get this data instead of reading the pages by eye.",
+  fqdn: "FQDN stands for Fully Qualified Domain Name — the complete address of a machine, such as ce01.example.ac.uk.",
+
   normalization:
     "Rewriting every catalogue's own format into one shared shape (name, country, coordinates, endpoints, services) without ever changing or deleting the original record.",
   reconciliation:

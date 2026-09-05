@@ -5,12 +5,13 @@ import {
   ComposableMap,
   Geographies,
   Geography,
+  Line,
   Marker,
   ZoomableGroup,
 } from "react-simple-maps";
 import { Link } from "@tanstack/react-router";
 import { X, ArrowUpRight, MapPin } from "lucide-react";
-import type { ProviderId, ReconciledSite } from "@/lib/pipeline/models";
+import type { ProviderId, ProviderRecord, ReconciledSite } from "@/lib/pipeline/models";
 import { ConfidenceBadge } from "./confidence-badge";
 import { ProviderBadge, ProviderBadges } from "./provider-badge";
 import { InfoTip } from "./info-tip";
@@ -26,6 +27,12 @@ const MARKER_COLOR: Record<ReconciledSite["confidence"], string> = {
   SINGLE: "#8a8378",
 };
 
+const PROVIDER_COLOR: Record<ProviderId, string> = {
+  gocdb: "#1c1c1c",
+  bdii: "#b8410e",
+  osg: "#5f7d8c",
+};
+
 const PROVIDER_LABEL: Record<ProviderId, string> = {
   gocdb: "GOCDB",
   bdii: "BDII / GLUE2",
@@ -38,11 +45,47 @@ interface WorldMapProps {
 
 type Placed = ReconciledSite & { latitude: number; longitude: number };
 
+interface RecordPoint {
+  record: ProviderRecord;
+  coords: [number, number];
+  /** true when the catalogue published its own position for this record */
+  own: boolean;
+}
+
+/**
+ * Each catalogue's record gets its own dot so the unification is visible:
+ * the published position when there is one, otherwise a spoke around the
+ * unified centre. Dots are nudged apart so overlapping records stay clickable.
+ */
+function recordPoints(site: Placed, zoom: number): RecordPoint[] {
+  const n = site.records.length;
+  const spread = n > 1 ? 1.9 / Math.max(zoom, 1) : 0;
+  return site.records.map((r, i) => {
+    const own =
+      r.coordinate_precision === "exact" &&
+      typeof r.latitude === "number" &&
+      typeof r.longitude === "number";
+    const baseLon = own ? r.longitude! : site.longitude;
+    const baseLat = own ? r.latitude! : site.latitude;
+    const angle = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2;
+    return {
+      record: r,
+      own,
+      coords: [
+        baseLon + Math.cos(angle) * spread,
+        baseLat + Math.sin(angle) * spread * 0.75,
+      ] as [number, number],
+    };
+  });
+}
+
 export function WorldMap({ sites }: WorldMapProps) {
   const [query, setQuery] = useState("");
   const [onlyMulti, setOnlyMulti] = useState(false);
+  const [showSpokes, setShowSpokes] = useState(true);
   const [hovered, setHovered] = useState<{
     site: Placed;
+    focus?: ProviderId;
     x: number;
     y: number;
   } | null>(null);
@@ -97,6 +140,18 @@ export function WorldMap({ sites }: WorldMapProps) {
           >
             Only unified across catalogues
           </button>
+          <button
+            type="button"
+            onClick={() => setShowSpokes((v) => !v)}
+            className={cn(
+              "border px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] transition-colors",
+              showSpokes
+                ? "border-accent bg-accent text-accent-foreground"
+                : "border-rule text-foreground hover:bg-foreground hover:text-background",
+            )}
+          >
+            One dot per catalogue
+          </button>
         </div>
 
         <div className="relative h-[560px] overflow-hidden border border-rule bg-paper">
@@ -118,6 +173,20 @@ export function WorldMap({ sites }: WorldMapProps) {
               </span>
             ))}
           </div>
+
+          {showSpokes ? (
+            <div className="absolute right-3 top-3 z-10 flex flex-wrap gap-3 border border-border bg-paper/95 px-2.5 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.14em] backdrop-blur">
+              {(Object.keys(PROVIDER_LABEL) as ProviderId[]).map((p) => (
+                <span key={p} className="flex items-center gap-1.5">
+                  <span
+                    className="h-2 w-2"
+                    style={{ background: PROVIDER_COLOR[p] }}
+                  />
+                  {PROVIDER_LABEL[p]}
+                </span>
+              ))}
+            </div>
+          ) : null}
 
           <ComposableMap
             projection="geoMercator"
@@ -155,40 +224,94 @@ export function WorldMap({ sites }: WorldMapProps) {
                   ))
                 }
               </Geographies>
+
               {points.map((site) => {
                 const multi = site.providers.length >= 2;
-                const isActive = selected?.canonical_id === site.canonical_id;
+                const isActive =
+                  selected?.canonical_id === site.canonical_id ||
+                  hovered?.site.canonical_id === site.canonical_id;
+                const spokes =
+                  showSpokes && multi ? recordPoints(site, position.zoom) : [];
+
                 return (
-                  <Marker
-                    key={site.canonical_id}
-                    coordinates={[site.longitude, site.latitude]}
-                  >
-                    <g
-                      className="cursor-pointer"
-                      onMouseEnter={(e) =>
-                        setHovered({
-                          site,
-                          x: e.clientX,
-                          y: e.clientY,
-                        })
-                      }
-                      onMouseMove={(e) =>
-                        setHovered({ site, x: e.clientX, y: e.clientY })
-                      }
-                      onMouseLeave={() => setHovered(null)}
-                      onClick={() => setSelected(site)}
-                    >
-                      <circle r={10} fill="transparent" />
-                      <circle
-                        r={multi ? 6.5 : 4.5}
-                        fill={MARKER_COLOR[site.confidence]}
-                        fillOpacity={isActive ? 0.45 : 0.18}
-                        stroke={MARKER_COLOR[site.confidence]}
-                        strokeWidth={multi ? 1.6 : 1}
+                  <g key={site.canonical_id}>
+                    {spokes.map((p) => (
+                      <Line
+                        key={`${site.canonical_id}-line-${p.record.source_id}`}
+                        from={[site.longitude, site.latitude]}
+                        to={p.coords}
+                        stroke={PROVIDER_COLOR[p.record.provider]}
+                        strokeWidth={isActive ? 1.4 : 0.7}
+                        strokeOpacity={isActive ? 0.95 : 0.35}
+                        strokeLinecap="round"
                       />
-                      <circle r={2} fill={MARKER_COLOR[site.confidence]} />
-                    </g>
-                  </Marker>
+                    ))}
+
+                    <Marker coordinates={[site.longitude, site.latitude]}>
+                      <g
+                        className="cursor-pointer"
+                        onMouseEnter={(e) =>
+                          setHovered({ site, x: e.clientX, y: e.clientY })
+                        }
+                        onMouseMove={(e) =>
+                          setHovered({ site, x: e.clientX, y: e.clientY })
+                        }
+                        onMouseLeave={() => setHovered(null)}
+                        onClick={() => setSelected(site)}
+                      >
+                        <circle r={10} fill="transparent" />
+                        <circle
+                          r={multi ? 6.5 : 4.5}
+                          fill={MARKER_COLOR[site.confidence]}
+                          fillOpacity={isActive ? 0.45 : 0.18}
+                          stroke={MARKER_COLOR[site.confidence]}
+                          strokeWidth={multi ? 1.6 : 1}
+                        />
+                        <circle r={2} fill={MARKER_COLOR[site.confidence]} />
+                      </g>
+                    </Marker>
+
+                    {spokes.map((p) => (
+                      <Marker
+                        key={`${site.canonical_id}-dot-${p.record.source_id}`}
+                        coordinates={p.coords}
+                      >
+                        <g
+                          className="cursor-pointer"
+                          onMouseEnter={(e) =>
+                            setHovered({
+                              site,
+                              focus: p.record.provider,
+                              x: e.clientX,
+                              y: e.clientY,
+                            })
+                          }
+                          onMouseMove={(e) =>
+                            setHovered({
+                              site,
+                              focus: p.record.provider,
+                              x: e.clientX,
+                              y: e.clientY,
+                            })
+                          }
+                          onMouseLeave={() => setHovered(null)}
+                          onClick={() => setSelected(site)}
+                        >
+                          <circle r={7} fill="transparent" />
+                          <rect
+                            x={-3}
+                            y={-3}
+                            width={6}
+                            height={6}
+                            fill={PROVIDER_COLOR[p.record.provider]}
+                            fillOpacity={isActive ? 1 : 0.65}
+                            stroke="#faf7f2"
+                            strokeWidth={0.8}
+                          />
+                        </g>
+                      </Marker>
+                    ))}
+                  </g>
                 );
               })}
             </ZoomableGroup>
@@ -197,9 +320,12 @@ export function WorldMap({ sites }: WorldMapProps) {
           {hovered ? <HoverCard hovered={hovered} /> : null}
         </div>
 
-        <p className="text-[11px] text-muted-foreground">
-          {points.length} centres shown · larger rings are described by more than
-          one catalogue. Hover to preview the sources, click to compare them.
+        <p className="text-[11px] leading-relaxed text-muted-foreground">
+          {points.length} centres shown. A large ring is one unified centre; the
+          small squares joined to it are the separate catalogue entries being
+          unified into it — one square per catalogue, at the position that
+          catalogue published. Hover any of them to see all of them together,
+          click to compare them side by side.
         </p>
       </div>
 
@@ -208,12 +334,14 @@ export function WorldMap({ sites }: WorldMapProps) {
   );
 }
 
+
 function HoverCard({
   hovered,
 }: {
-  hovered: { site: Placed; x: number; y: number };
+  hovered: { site: Placed; focus?: ProviderId; x: number; y: number };
 }) {
-  const { site, x, y } = hovered;
+  const { site, x, y, focus } = hovered;
+
   return (
     <div
       className="pointer-events-none fixed z-50 w-[320px] border border-rule bg-paper p-3 shadow-xl"
@@ -236,22 +364,44 @@ function HoverCard({
       <p className="mt-3 text-[9.5px] font-semibold uppercase tracking-[0.16em] text-accent">
         {site.records.length === 1
           ? "Described by 1 catalogue"
-          : `The same centre in ${site.records.length} catalogues`}
+          : `${site.records.length} catalogue entries unified into this one centre`}
       </p>
       <div className="mt-1.5 divide-y divide-border border-y border-border">
-        {site.records.map((r) => (
-          <div key={r.source_id} className="flex gap-2 py-1.5">
-            <ProviderBadge provider={r.provider} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[11.5px] font-medium">{r.name}</p>
-              <p className="truncate text-[10px] text-muted-foreground">
-                {r.country ?? "—"} · {r.services.length} services ·{" "}
-                {r.endpoints.length} endpoints
-              </p>
+        {site.records.map((r) => {
+          const hasOwn =
+            r.coordinate_precision === "exact" &&
+            typeof r.latitude === "number" &&
+            typeof r.longitude === "number";
+          return (
+            <div
+              key={r.source_id}
+              className={cn(
+                "flex gap-2 py-1.5",
+                focus === r.provider && "bg-accent/8",
+              )}
+            >
+              <span
+                className="mt-1 h-2 w-2 shrink-0"
+                style={{ background: PROVIDER_COLOR[r.provider] }}
+              />
+              <ProviderBadge provider={r.provider} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[11.5px] font-medium">{r.name}</p>
+                <p className="truncate text-[10px] text-muted-foreground">
+                  {r.country ?? "—"} · {r.services.length} services ·{" "}
+                  {r.endpoints.length} endpoints
+                </p>
+                <p className="truncate font-mono text-[9.5px] text-muted-foreground">
+                  {hasOwn
+                    ? `${r.latitude!.toFixed(2)}, ${r.longitude!.toFixed(2)} (own position)`
+                    : "no position published — placed beside the centre"}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
 
       {site.evidence.length > 0 ? (
         <p className="mt-2 text-[10.5px] leading-relaxed text-ink-soft">
