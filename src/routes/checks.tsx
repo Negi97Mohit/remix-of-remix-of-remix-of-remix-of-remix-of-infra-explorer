@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ShieldCheck, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Play, Server, Clock, Database } from "lucide-react";
+import { ShieldCheck, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Play, Clock } from "lucide-react";
 import { validationQueryOptions } from "@/lib/queries";
-import { ProviderBadge } from "@/components/provider-badge";
-import { InfoTip } from "@/components/info-tip";
 import { cn } from "@/lib/utils";
 import { CRIC_ADAPTER_HEALTH, INGESTION_QUALITY_LOG } from "@/lib/pipeline/cric-demo";
+import type { ValidationCheck } from "@/lib/pipeline/validation";
 
 const TITLE = "Quality & Pipeline Audit — CERN CRIC Technical POC";
 const DESC =
@@ -99,7 +98,7 @@ function ChecksPage() {
             <button
               onClick={triggerPipelineRun}
               disabled={isRunning}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 text-xs font-semibold uppercase tracking-wider rounded transition-colors"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 text-xs font-semibold uppercase tracking-wider rounded transition-colors cursor-pointer"
             >
               <Play className="h-3.5 w-3.5" />
               {isRunning ? "Executing..." : "Trigger Pipeline Run"}
@@ -180,7 +179,7 @@ function ChecksPage() {
       </section>
 
       {/* ========================================================================= */}
-      {/* 3. POST-UNIFICATION INTEGRITY CHECKS                                      */}
+      {/* 3. POST-UNIFICATION INTEGRITY CHECKS (FULL AUDIT DETAILS)                 */}
       {/* ========================================================================= */}
       <section className="space-y-4">
         <div className="flex justify-between items-end border-b border-rule pb-2">
@@ -189,57 +188,104 @@ function ChecksPage() {
               Formal Invariant Checks
             </h2>
             <p className="text-xs text-muted-foreground">
-              Guarantees zero record loss, uniqueness, and auditable evidence.
+              Server-side verification answering whether records were dropped, duplicated, or merged without evidence.
             </p>
           </div>
           <div className="flex gap-2">
-            <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-mono text-xs font-bold">
+            <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded font-mono text-xs font-bold">
               {report.passed} PASSED
             </span>
-            <span className="px-2 py-1 bg-amber-100 text-amber-800 rounded font-mono text-xs font-bold">
+            <span className="px-2.5 py-1 bg-amber-100 text-amber-800 rounded font-mono text-xs font-bold">
               {report.warned} WARNINGS
             </span>
+            {report.failed > 0 && (
+              <span className="px-2.5 py-1 bg-rose-100 text-rose-800 rounded font-mono text-xs font-bold">
+                {report.failed} FAILED
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="grid gap-3">
-          {report.checks.map((check) => {
-            const isPass = check.status === "pass";
-            const isWarn = check.status === "warn";
-            return (
-              <div
-                key={check.id}
-                className={cn(
-                  "border p-4 rounded bg-card flex items-start gap-3",
-                  isPass ? "border-rule" : isWarn ? "border-amber-400/50 bg-amber-50/20" : "border-rose-400/50 bg-rose-50/20"
-                )}
-              >
-                <div className="mt-0.5">
-                  {isPass ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                  ) : isWarn ? (
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-rose-600" />
-                  )}
-                </div>
-                <div className="flex-1 space-y-1 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-foreground text-sm">{check.name}</span>
-                    <span className="font-mono text-[10px] text-muted-foreground">{check.id}</span>
-                  </div>
-                  <p className="text-muted-foreground">{check.description}</p>
-                  {check.detail && (
-                    <div className="mt-2 p-2 bg-background rounded font-mono text-[11px] text-foreground border border-rule/50">
-                      {check.detail}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+        <div className="grid gap-4">
+          {report.checks.map((check) => (
+            <CheckCard key={check.id} check={check} />
+          ))}
         </div>
       </section>
+    </div>
+  );
+}
+
+function CheckCard({ check }: { check: ValidationCheck }) {
+  const Icon = {
+    pass: CheckCircle2,
+    warn: AlertTriangle,
+    fail: XCircle,
+  }[check.status];
+
+  const iconColor = {
+    pass: "text-emerald-700",
+    warn: "text-amber-700",
+    fail: "text-rose-700",
+  }[check.status];
+
+  const borderColor = {
+    pass: "border-rule",
+    warn: "border-amber-400/60 bg-amber-50/15",
+    fail: "border-rose-400/60 bg-rose-50/15",
+  }[check.status];
+
+  return (
+    <div className={cn("border bg-card p-5 rounded space-y-3 shadow-xs", borderColor)}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", iconColor)} />
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-display text-base font-bold text-foreground">{check.title}</h3>
+              <span className="font-mono text-[10px] text-muted-foreground">({check.id})</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">{check.question}</p>
+          </div>
+        </div>
+        <span
+          className={cn(
+            "border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] rounded",
+            check.status === "pass"
+              ? "border-emerald-700/30 bg-emerald-700/10 text-emerald-700"
+              : check.status === "warn"
+                ? "border-amber-700/30 bg-amber-700/10 text-amber-700"
+                : "border-rose-700/30 bg-rose-700/10 text-rose-700",
+          )}
+        >
+          {check.status.toUpperCase()}
+        </span>
+      </div>
+
+      <div className="text-xs leading-relaxed text-foreground font-medium bg-background/60 p-2.5 rounded border border-rule/50">
+        {check.summary}
+      </div>
+
+      {check.samples && check.samples.length > 0 && (
+        <div className="border-t border-rule pt-3 space-y-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {check.count > check.samples.length
+              ? `Flagged Records (Showing first ${check.samples.length} of ${check.count}):`
+              : `Flagged Records (${check.count}):`}
+          </p>
+          <div className="space-y-1.5 font-mono text-xs">
+            {check.samples.map((s, i) => (
+              <div
+                key={i}
+                className="p-2 bg-background rounded border border-rule/50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1"
+              >
+                <span className="font-bold text-accent">{s.label}</span>
+                <span className="text-muted-foreground text-[11px]">{s.detail}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
