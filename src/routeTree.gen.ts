@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ApiRouteImport } from './routes/api'
 import { Route as DataFlowRouteImport } from './routes/data-flow'
+import { Route as GuideRouteImport } from './routes/guide'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as ReconciliationRouteImport } from './routes/reconciliation'
@@ -38,6 +39,11 @@ const ApiRoute = ApiRouteImport.update({
 const DataFlowRoute = DataFlowRouteImport.update({
   id: '/data-flow',
   path: '/data-flow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuideRoute = GuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnRoute = LearnRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
+  '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
   '/reconciliation': typeof ReconciliationRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
+  '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
   '/reconciliation': typeof ReconciliationRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/api': typeof ApiRoute
   '/data-flow': typeof DataFlowRoute
+  '/guide': typeof GuideRoute
   '/learn': typeof LearnRoute
   '/map': typeof MapRoute
   '/reconciliation': typeof ReconciliationRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api'
     | '/data-flow'
+    | '/guide'
     | '/learn'
     | '/map'
     | '/reconciliation'
@@ -126,6 +136,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api'
     | '/data-flow'
+    | '/guide'
     | '/learn'
     | '/map'
     | '/reconciliation'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api'
     | '/data-flow'
+    | '/guide'
     | '/learn'
     | '/map'
     | '/reconciliation'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ApiRoute: typeof ApiRoute
   DataFlowRoute: typeof DataFlowRoute
+  GuideRoute: typeof GuideRoute
   LearnRoute: typeof LearnRoute
   MapRoute: typeof MapRoute
   ReconciliationRoute: typeof ReconciliationRoute
@@ -184,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/data-flow'
       fullPath: '/data-flow'
       preLoaderRoute: typeof DataFlowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide': {
+      id: '/guide'
+      path: '/guide'
+      fullPath: '/guide'
+      preLoaderRoute: typeof GuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn': {
@@ -248,6 +268,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ApiRoute: ApiRoute,
   DataFlowRoute: DataFlowRoute,
+  GuideRoute: GuideRoute,
   LearnRoute: LearnRoute,
   MapRoute: MapRoute,
   ReconciliationRoute: ReconciliationRoute,
