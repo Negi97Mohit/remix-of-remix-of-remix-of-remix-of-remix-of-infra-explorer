@@ -48,7 +48,7 @@ function SiteDetailPage() {
   if (!site) {
     return (
       <div className="space-y-4">
-        <Link to="/sites" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link to="/sites/" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back to sites
         </Link>
         <p className="text-muted-foreground">Site not found.</p>
@@ -69,7 +69,7 @@ function SiteDetailPage() {
 
   return (
     <div className="space-y-5">
-      <Link to="/sites" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+      <Link to="/sites/" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-4 w-4" /> Back to sites
       </Link>
 
