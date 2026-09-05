@@ -17,6 +17,7 @@ import { ConfidenceBadge } from "@/components/confidence-badge";
 import { ProviderBadge, ProviderBadges } from "@/components/provider-badge";
 import { QualityList } from "@/components/quality-list";
 import { InfoTip } from "@/components/info-tip";
+import { ScoringGuide } from "@/components/scoring-guide";
 import { cn } from "@/lib/utils";
 import type { ProviderId, ProviderRecord } from "@/lib/pipeline/models";
 
@@ -272,9 +273,29 @@ function SiteDetailPage() {
       ) : null}
 
       <section className="space-y-3">
+        <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+          <GitMerge className="h-5 w-5" /> Field-by-field comparison{" "}
+          <InfoTip term="provider" />
+        </h2>
+        <p className="max-w-2xl text-sm text-ink-soft">
+          Each row is one field. Each column is one catalogue. Values that agree
+          across catalogues are highlighted; differences are shown so they can be
+          judged.
+        </p>
+        <ComparisonMatrix records={site.records} providers={site.providers} />
+      </section>
+
+      <section className="space-y-3">
+        <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+          How the score was reached <InfoTip term="confidence" />
+        </h2>
+        <ScoringGuide compact />
+      </section>
+
+      <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
-            <GitMerge className="h-5 w-5" /> Side-by-side catalogue records{" "}
+            <GitMerge className="h-5 w-5" /> Raw catalogue records{" "}
             <InfoTip term="provider" />
           </h2>
           <div className="flex flex-wrap items-center gap-1">
@@ -326,6 +347,125 @@ function SiteDetailPage() {
         >
           See all reconciliations <ArrowUpRight className="h-3 w-3" />
         </Link>
+      </div>
+    </div>
+  );
+}
+
+function ComparisonMatrix({
+  records,
+  providers,
+}: {
+  records: ProviderRecord[];
+  providers: ProviderId[];
+}) {
+  const byProvider = Object.fromEntries(
+    providers.map((p) => [p, records.find((r) => r.provider === p)]),
+  ) as Record<ProviderId, ProviderRecord | undefined>;
+
+  const rows = [
+    {
+      key: "name",
+      label: "Name",
+      value: (r: ProviderRecord) => r.name,
+      compare: (a: string, b: string) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" }) === 0,
+    },
+    {
+      key: "country",
+      label: "Country",
+      value: (r: ProviderRecord) =>
+        r.country_code ? `${r.country} (${r.country_code})` : r.country || "—",
+      compare: (a: string, b: string) => a === b,
+    },
+    {
+      key: "coords",
+      label: "Coordinates",
+      value: (r: ProviderRecord) =>
+        r.latitude !== undefined && r.longitude !== undefined
+          ? `${r.latitude.toFixed(4)}, ${r.longitude.toFixed(4)} (${r.coordinate_precision})`
+          : "—",
+      compare: (a: string, b: string) => a === b,
+    },
+    {
+      key: "endpoint",
+      label: "Endpoint",
+      value: (r: ProviderRecord) => r.endpoints[0] || "—",
+      compare: (a: string, b: string) => a === b,
+    },
+    {
+      key: "services",
+      label: "Services",
+      value: (r: ProviderRecord) =>
+        r.services.length
+          ? `${r.services.length}: ${r.services.map((s) => s.name).join(", ")}`
+          : "—",
+      compare: () => false,
+    },
+  ];
+
+  return (
+    <div className="overflow-x-auto border border-rule bg-paper">
+      <table className="w-full text-left text-xs">
+        <thead className="border-b border-rule bg-secondary/40">
+          <tr>
+            <th className="px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em]">
+              Field
+            </th>
+            {providers.map((p) => (
+              <th key={p} className="px-3 py-2">
+                <ProviderBadge provider={p} showShort />
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-rule">
+          {rows.map((row) => {
+            const values = providers.map((p) => row.value(byProvider[p]!));
+            const present = values.filter((v) => v !== "—");
+            const allAgree =
+              present.length >= 2 &&
+              present.every((v) => row.compare(v, present[0]!));
+            const anyMissing = values.some((v) => v === "—");
+
+            return (
+              <tr key={row.key}>
+                <td className="px-3 py-2.5 font-mono text-[10px] uppercase text-muted-foreground">
+                  {row.label}
+                </td>
+                {providers.map((p) => {
+                  const value = row.value(byProvider[p]!);
+                  return (
+                    <td
+                      key={p}
+                      className={cn(
+                        "px-3 py-2.5",
+                        allAgree
+                          ? "bg-emerald-700/5 text-emerald-900"
+                          : anyMissing
+                            ? "bg-amber-700/5 text-amber-900"
+                            : "text-ink-soft",
+                      )}
+                    >
+                      <span className="break-words font-mono">{value}</span>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <div className="flex flex-wrap gap-3 border-t border-rule px-3 py-2 text-[10px] text-muted-foreground">
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 bg-emerald-700/10" /> Agrees across catalogues
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 bg-amber-700/10" /> Missing or partial
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="h-2.5 w-2.5 bg-paper" /> Differs — inspect below
+        </span>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { snapshotQueryOptions } from "@/lib/queries";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import { ProviderBadges } from "@/components/provider-badge";
 import { InfoTip } from "@/components/info-tip";
+import { ScoringGuide } from "@/components/scoring-guide";
 import { cn } from "@/lib/utils";
 import type { ConfidenceBand, ReconciledSite } from "@/lib/pipeline/models";
 
@@ -61,6 +62,10 @@ function ReconciliationPage() {
           are shown, not hidden.
         </p>
       </header>
+
+      <section className="border border-rule bg-paper p-5">
+        <ScoringGuide />
+      </section>
 
       <div className="flex flex-wrap gap-1">
         {(["all", "HIGH", "MEDIUM", "REVIEW"] as const).map((b) => (

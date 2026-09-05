@@ -9,6 +9,8 @@ import {
   Code2,
   Info,
   BookOpen,
+  FileSpreadsheet,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +19,8 @@ const NAV_ITEMS = [
   { to: "/map", label: "Map", icon: Globe },
   { to: "/sites", label: "Sites", icon: Database },
   { to: "/reconciliation", label: "Reconciliation", icon: GitMerge },
+  { to: "/data", label: "Raw data", icon: FileSpreadsheet },
+  { to: "/checks", label: "Checks", icon: ShieldCheck },
   { to: "/data-flow", label: "Data Flow", icon: Workflow },
   { to: "/guide", label: "Guide", icon: BookOpen },
   { to: "/learn", label: "Learn", icon: GraduationCap },

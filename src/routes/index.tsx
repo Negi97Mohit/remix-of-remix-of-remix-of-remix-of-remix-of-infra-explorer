@@ -96,7 +96,7 @@ function DashboardPage() {
     <div className="space-y-12">
       <section className="grid gap-8 border-b border-rule pb-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
         <div className="space-y-4">
-          <p className="label-micro">
+          <p className="label-micro" suppressHydrationWarning>
             Retrieved {new Date(snapshot.built_at).toUTCString()} · built in{" "}
             {snapshot.duration_ms} ms
           </p>

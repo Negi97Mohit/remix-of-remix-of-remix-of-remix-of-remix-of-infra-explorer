@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GLOSSARY, InfoTip } from "@/components/info-tip";
+import { ScoringGuide } from "@/components/scoring-guide";
 
 export const Route = createFileRoute("/guide")({
   head: () => ({
@@ -223,21 +224,7 @@ function GuidePage() {
 
       <section className="space-y-6">
         <h2 className="font-display text-2xl font-bold">Reading a match</h2>
-        <div className="grid gap-px bg-border sm:grid-cols-2">
-          {[
-            ["High", "70 points or more of agreeing evidence. Safe to treat as one site."],
-            ["Medium", "45 points or more. Likely the same site, worth a glance."],
-            ["Review", "Below 45 points. A human should decide."],
-            ["Single", "Only one catalogue knows this site. Nothing to compare yet."],
-          ].map(([band, text]) => (
-            <div key={band} className="bg-paper p-5">
-              <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-accent">
-                {band}
-              </p>
-              <p className="text-sm leading-relaxed text-ink-soft">{text}</p>
-            </div>
-          ))}
-        </div>
+        <ScoringGuide />
       </section>
 
       <section className="space-y-6">
