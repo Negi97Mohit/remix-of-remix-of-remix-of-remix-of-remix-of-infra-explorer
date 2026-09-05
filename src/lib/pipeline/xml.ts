@@ -62,7 +62,7 @@ export function parseXml(xml: string): XmlNode {
       if (stack.length > 1) stack.pop();
       continue;
     }
-    const node: XmlNode = { tag, attrs: parseAttrs(rest ?? ""), text: "", children: [] };
+    const node: XmlNode = { tag: tag ?? "", attrs: parseAttrs(rest ?? ""), text: "", children: [] };
     current.children.push(node);
     if (!selfClose) stack.push(node);
   }
