@@ -1,20 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import {
-  Globe2,
-  Database,
-  GitMerge,
-  Layers,
-  AlertTriangle,
-  Clock,
-  Zap,
-  TrendingUp,
-} from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { snapshotQueryOptions } from "@/lib/queries";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ConfidenceBadge } from "@/components/confidence-badge";
 import { ProviderBadge } from "@/components/provider-badge";
+import { InfoTip } from "@/components/info-tip";
 import type { ConfidenceBand, ProviderHealth } from "@/lib/pipeline/models";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +13,23 @@ export const Route = createFileRoute("/")({
     context.queryClient.ensureQueryData(snapshotQueryOptions),
   head: () => ({
     meta: [
-      { title: "Dashboard — WLCG Infrastructure Explorer" },
+      { title: "WLCG Infrastructure Explorer — One list from three catalogues" },
       {
         name: "description",
         content:
-          "Overview of reconciled WLCG infrastructure: provider health, confidence distribution, coverage and conflicts.",
+          "Live view of grid computing centres unified across GOCDB, BDII and OSG: coverage, match confidence, source health and disagreements.",
       },
+      {
+        property: "og:title",
+        content: "WLCG Infrastructure Explorer — One list from three catalogues",
+      },
+      {
+        property: "og:description",
+        content:
+          "Live view of grid computing centres unified across GOCDB, BDII and OSG: coverage, match confidence, source health and disagreements.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: DashboardPage,
@@ -40,11 +41,9 @@ function DashboardPage() {
   const sites = snapshot.sites;
   const matched = sites.filter((s) => s.providers.length >= 2);
   const single = sites.filter((s) => s.providers.length === 1);
-  const countries = new Set(
-    sites.map((s) => s.country_code).filter(Boolean),
-  ).size;
+  const countries = new Set(sites.map((s) => s.country_code).filter(Boolean))
+    .size;
   const conflicts = sites.flatMap((s) => s.conflicts);
-  const totalRecords = snapshot.records.length;
 
   const bandCounts = sites.reduce(
     (acc, s) => {
@@ -54,235 +53,216 @@ function DashboardPage() {
     {} as Record<ConfidenceBand, number>,
   );
 
-  const kpis = [
+  const stats = [
     {
-      label: "Reconciled Sites",
+      label: "Centres",
       value: sites.length,
-      icon: Database,
-      sub: `${matched.length} matched · ${single.length} single-source`,
+      note: "unified entries",
+      term: "canonical",
     },
     {
-      label: "Source Records",
-      value: totalRecords,
-      icon: Layers,
-      sub: "across all providers",
+      label: "Unified",
+      value: matched.length,
+      note: "in 2+ catalogues",
+      term: "reconciliation",
     },
     {
-      label: "Countries Covered",
+      label: "Single source",
+      value: single.length,
+      note: "only 1 catalogue",
+      term: "site",
+    },
+    {
+      label: "Countries",
       value: countries,
-      icon: Globe2,
-      sub: "by ISO code",
+      note: "represented",
+      term: "coordinates",
     },
     {
-      label: "Field Conflicts",
+      label: "Disagreements",
       value: conflicts.length,
-      icon: AlertTriangle,
-      sub: "across matched sites",
+      note: "fields to judge",
+      term: "conflict",
     },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">Infrastructure Dashboard</h1>
-        <p className="text-sm text-muted-foreground">
-          Live reconciliation of heterogeneous grid metadata. Built at{" "}
-          <span className="font-mono text-foreground">
-            {new Date(snapshot.built_at).toISOString()}
-          </span>{" "}
-          in {snapshot.duration_ms} ms.
-        </p>
-      </div>
+    <div className="space-y-12">
+      <section className="grid gap-8 border-b border-rule pb-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+        <div className="space-y-4">
+          <p className="label-micro">
+            Retrieved {new Date(snapshot.built_at).toUTCString()} · built in{" "}
+            {snapshot.duration_ms} ms
+          </p>
+          <h1 className="font-display text-4xl font-black leading-[1.03] sm:text-6xl">
+            One list of the world&apos;s
+            <br />
+            <em className="font-normal italic text-accent">
+              scientific computing centres
+            </em>
+          </h1>
+          <p className="max-w-xl text-[15px] leading-relaxed text-ink-soft">
+            Three regional catalogues describe the same centres in different
+            words. This explorer reads them live, works out which entries are the
+            same place, and shows the reasoning openly — so a single trustworthy
+            list can be checked rather than assumed.
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <Link
+              to="/map"
+              className="inline-flex items-center gap-1.5 bg-foreground px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-background hover:opacity-80"
+            >
+              Explore the map <ArrowUpRight className="h-3 w-3" />
+            </Link>
+            <Link
+              to="/guide"
+              className="inline-flex items-center gap-1.5 border border-rule px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] hover:bg-foreground hover:text-background"
+            >
+              Read the guide
+            </Link>
+          </div>
+        </div>
 
-      {/* KPI cards */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {kpis.map((kpi) => {
-          const Icon = kpi.icon;
-          return (
-            <Card key={kpi.label} className="gap-0">
-              <CardHeader className="flex-row items-center justify-between pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">
-                  {kpi.label}
-                </CardTitle>
-                <Icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="text-3xl font-bold tabular-nums">{kpi.value}</div>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">{kpi.sub}</p>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+        <div className="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-2">
+          {stats.map((s) => (
+            <div key={s.label} className="bg-paper p-4">
+              <p className="flex items-center gap-1 label-micro">
+                {s.label} <InfoTip term={s.term} />
+              </p>
+              <p className="mt-1 font-display text-3xl font-black tabular-nums">
+                {s.value}
+              </p>
+              <p className="text-[10.5px] text-muted-foreground">{s.note}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Provider Health */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Zap className="h-4 w-4" /> Provider Health
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+      <section className="grid gap-10 lg:grid-cols-[1.3fr_1fr]">
+        <div className="space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+            Where the data comes from{" "}
+            <InfoTip term="provider" />
+          </h2>
+          <div className="divide-y divide-border border-y border-border">
             {snapshot.providers.map((p) => (
               <ProviderHealthRow key={p.provider} health={p} />
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Confidence distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <TrendingUp className="h-4 w-4" /> Confidence Bands
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+        <div className="space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+            How sure are the matches <InfoTip term="confidence" />
+          </h2>
+          <div className="space-y-3">
             {(["HIGH", "MEDIUM", "REVIEW", "SINGLE"] as ConfidenceBand[]).map(
               (band) => {
                 const count = bandCounts[band] ?? 0;
                 const pct = sites.length ? (count / sites.length) * 100 : 0;
                 return (
-                  <div key={band} className="flex items-center gap-3">
-                    <ConfidenceBadge band={band} className="w-16 justify-center" />
-                    <div className="flex-1">
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-sm font-semibold tabular-nums">
-                          {count}
-                        </span>
-                        <span className="text-[11px] text-muted-foreground">
-                          {pct.toFixed(0)}%
-                        </span>
-                      </div>
-                      <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-muted">
-                        <div
-                          className="h-full rounded-full bg-primary transition-all"
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
+                  <div key={band} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <ConfidenceBadge band={band} />
+                      <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+                        {count} · {pct.toFixed(0)}%
+                      </span>
+                    </div>
+                    <div className="h-[3px] w-full bg-border">
+                      <div
+                        className="h-full bg-accent"
+                        style={{ width: `${pct}%` }}
+                      />
                     </div>
                   </div>
                 );
               },
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </section>
 
-      {/* Top conflicts */}
-      {conflicts.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle className="h-4 w-4" /> Field Conflicts ({conflicts.length})
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-2 md:grid-cols-2">
-              {conflicts.slice(0, 8).map((c, i) => (
-                <Link
-                  key={i}
-                  to="/reconciliation"
-                  className="rounded-lg border border-border/60 p-3 transition-colors hover:bg-secondary/50"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-xs font-semibold text-foreground">
-                      {c.field}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[10px] font-semibold uppercase",
-                        c.status === "unresolved" ? "text-rose-400" : "text-emerald-400",
-                      )}
-                    >
-                      {c.status.replace(/-/g, " ")}
-                    </span>
-                  </div>
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {c.values.map((v, j) => (
-                      <span
-                        key={j}
-                        className="flex items-center gap-1 rounded border border-border/60 px-1.5 py-0.5 text-[10px]"
-                      >
-                        <ProviderBadge provider={v.provider} showShort />
-                        <span className="font-mono">{v.value}</span>
-                      </span>
-                    ))}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Quick links */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { to: "/map" as const, label: "World Map", desc: "Geographic view of all sites" },
-          { to: "/sites" as const, label: "Site Explorer", desc: "Search & filter sites" },
-          { to: "/reconciliation" as const, label: "Reconciliation", desc: "Evidence & conflicts" },
-          { to: "/data-flow" as const, label: "Data Flow", desc: "Pipeline stages" },
-        ].map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            className="rounded-lg border border-border/60 p-4 transition-colors hover:border-primary/40 hover:bg-secondary/50"
-          >
-            <div className="text-sm font-semibold">{link.label}</div>
-            <div className="mt-0.5 text-xs text-muted-foreground">{link.desc}</div>
-          </Link>
-        ))}
-      </div>
+      {conflicts.length > 0 ? (
+        <section className="space-y-4">
+          <h2 className="flex items-center gap-2 font-display text-2xl font-bold">
+            Where catalogues disagree <InfoTip term="conflict" />
+          </h2>
+          <div className="grid gap-px bg-border md:grid-cols-2">
+            {conflicts.slice(0, 6).map((c, i) => (
+              <Link
+                key={i}
+                to="/reconciliation"
+                className="group bg-paper p-4 hover:bg-secondary"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.16em]">
+                    {c.field}
+                  </span>
+                  <span
+                    className={cn(
+                      "text-[9.5px] font-semibold uppercase tracking-[0.14em]",
+                      c.status === "unresolved"
+                        ? "text-destructive"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    {c.status.replace(/-/g, " ")}
+                  </span>
+                </div>
+                <div className="mt-2 space-y-0.5">
+                  {c.values.map((v, j) => (
+                    <p key={j} className="text-[11.5px] text-ink-soft">
+                      <span className="text-muted-foreground">
+                        {v.provider.toUpperCase()}:
+                      </span>{" "}
+                      {v.value}
+                    </p>
+                  ))}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
 
 function ProviderHealthRow({ health }: { health: ProviderHealth }) {
-  const statusColor = {
-    healthy: "text-emerald-400",
-    degraded: "text-amber-400",
-    error: "text-rose-400",
-  }[health.status];
-
-  const dotClass = {
-    healthy: "bg-emerald-400",
-    degraded: "bg-amber-400",
-    error: "bg-rose-400",
+  const dot = {
+    healthy: "bg-accent",
+    degraded: "bg-amber-600",
+    error: "bg-destructive",
   }[health.status];
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-border/60 p-3">
-      <div className={cn("h-2 w-2 shrink-0 rounded-full", dotClass)} />
+    <div className="flex items-start gap-3 py-4">
+      <span className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full", dot)} />
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <ProviderBadge provider={health.provider} />
-          <span className="truncate text-xs text-muted-foreground">
-            {health.label} · {health.protocol}
-          </span>
-          <span className={cn("text-[10px] font-semibold uppercase", statusColor)}>
-            {health.status}
-          </span>
-          <span className="ml-auto shrink-0 text-[10px] font-medium text-muted-foreground">
-            {health.mode}
+          <span className="text-sm font-medium">{health.label}</span>
+          <InfoTip term={health.provider} />
+          <span className="ml-auto text-[9.5px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            {health.mode === "live" ? "Live" : "Snapshot"}
           </span>
         </div>
-        <div className="mt-1 flex items-center gap-3 text-[11px] text-muted-foreground">
+        <p className="mt-1 flex flex-wrap gap-x-3 text-[11px] text-muted-foreground">
           <span className="tabular-nums">{health.record_count} records</span>
-          {health.latency_ms !== null && (
-            <span className="flex items-center gap-0.5 tabular-nums">
-              <Clock className="h-3 w-3" /> {health.latency_ms} ms
-            </span>
-          )}
-          {health.last_retrieved && (
+          {health.latency_ms !== null ? (
+            <span className="tabular-nums">{health.latency_ms} ms</span>
+          ) : null}
+          {health.last_retrieved ? (
             <span className="font-mono">
               {new Date(health.last_retrieved).toISOString().slice(0, 16)}Z
             </span>
-          )}
-        </div>
-        {health.note && (
-          <p className="mt-1 text-[10px] text-muted-foreground/80">{health.note}</p>
-        )}
+          ) : null}
+        </p>
+        {health.note ? (
+          <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
+            {health.note}
+          </p>
+        ) : null}
       </div>
     </div>
   );
